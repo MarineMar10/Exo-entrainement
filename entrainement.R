@@ -4,6 +4,7 @@ library(vroom)
 library(here)
 here::i_am("Exo-entrainement.Rproj")
 white_wine <-vroom(here("Data","winequality-white.csv"))
+## Exercise 3
 ## Question 1 Transform the quality variable of the wine data sets into a ordered factor, 
 ## using the fact that grades are integers ranging from 1 to 10.
 
@@ -73,5 +74,26 @@ credit|>
   ggplot(aes(x=MARRIAGE, fill= SEX))+
   geom_bar(position= "fill")+
 facet_wrap(vars(EDUCATION))
+
+## Back to Exercise 3: 
+##Question 1 Use a violin plot (with geom_violin) to compare the authorized credit 
+##of clients (variable LIMIT_BAL) between education levels.
+credit|>
+  drop_na(EDUCATION) |>
+  ggplot(aes(x=LIMIT_BAL, y=EDUCATION, fill=EDUCATION))+
+  geom_violin()
+
+##Question 2 Use faceting to integrate the marital status in the comparison.
+credit|>
+  drop_na(EDUCATION, MARRIAGE) |>
+  ggplot(aes(x=LIMIT_BAL, y=EDUCATION))+
+  geom_violin(color="plum")+
+  facet_wrap(vars(MARRIAGE))
+
+##Question 3 Using an adapted graphical representation, compare the age distribution 
+##between the sexes.
+
+ggplot(credit, aes(x = SEX, y = AGE, fill = SEX)) +
+  geom_boxplot() 
 
 
