@@ -27,7 +27,7 @@ red_wine <-vroom(here("Data","winequality-red.csv"))
 white_wine <- white_wine |> mutate(color= "White")
 red_wine <- red_wine |> mutate(color= "Red")
 wines <- rbind(white_wine, red_wine)
-ggplot(wines, aes(x=`volatile acidity`, fill=quality))+
+ggplot(wines, aes(y=`volatile acidity`, fill=quality))+
   geom_boxplot()+
   facet_wrap(vars(color))
 
@@ -96,4 +96,29 @@ credit|>
 ggplot(credit, aes(x = SEX, y = AGE, fill = SEX)) +
   geom_boxplot() 
 
+##Exercise 1
+##Question 1 Draw a scatter plot of the alcohol content of the red wines as 
+##a function of their pH, using transparency to limit the effects of 
+##superimposition.
+ggplot(red_wine, aes(x=alcohol, y=pH))+
+  geom_point(alpha=0.2)
 
+##Question 2 Draw a graphical representation of the distribution of the 
+##sulphates in white wines.
+ggplot(white_wine, aes(x=sulphates))+
+  geom_density(color= "plum")
+
+##Question 3 Use a simple data transformation to combine the two data sets 
+##and use the resulting data frame to show on the same figure a scatter plot 
+##of the citric acid content as a function of the residual sugar.
+
+ggplot(wines, aes(x=`citric acid`, y=`residual sugar`, color=color))+
+  geom_point(alpha=0.1)
+
+##Question 4 Using the same data transformation, display side by side the 
+##scatter plots of the volatile acidity as a function of the fixed acidity 
+##for red wines and white wines (one scatter plot per wine “color”).
+
+ggplot(wines, aes(y=`volatile acidity`, x=`fixed acidity`))+
+  geom_point(alpha=0.1)+
+  facet_wrap(vars(color))
