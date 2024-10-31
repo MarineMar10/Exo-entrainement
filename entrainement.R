@@ -68,7 +68,10 @@ credit|>
 ##Question 4 Show the distribution of the education level conditioned over both the 
 ##marital status and the sex. To do so, it is recommended to combine multiple bar plots
 ##using faceting.
-
-
+credit|>
+  drop_na(EDUCATION, MARRIAGE) |>
+  ggplot(aes(x=MARRIAGE, fill= SEX))+
+  geom_bar(position= "fill")+
+facet_wrap(vars(EDUCATION))
 
 
