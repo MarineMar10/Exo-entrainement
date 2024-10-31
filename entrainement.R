@@ -122,3 +122,47 @@ ggplot(wines, aes(x=`citric acid`, y=`residual sugar`, color=color))+
 ggplot(wines, aes(y=`volatile acidity`, x=`fixed acidity`))+
   geom_point(alpha=0.1)+
   facet_wrap(vars(color))
+
+## Ancien graded lab
+## Exercice 1
+## Question 1 Load the data set using a local file name (preferably using here).
+
+music <-vroom(here("Data","top-spotify-songs-from-20102019-by-year.csv"))
+
+##Question 2 Using distinct (among other functions) compute the number of 
+##different songs, artists and musical genre that have been included in the data set.
+
+music |> 
+  distinct(artist, `top genre`, title) |>
+  summarise(n())
+
+##Question 3 Compute the number of songs per year.
+
+music |>
+  summarise(title=n(), .by = year)|>
+  knitr::kable()
+
+## Question 4 Find the most popular artist in the data set, i.e. the 
+##artist with the largest number of songs in the data set. Make sure to 
+##count each song only once
+
+music|>
+  distinct(title, .keep_all = TRUE)|>
+  group_by(artist)|>
+  summarise(title= n()) |>
+  arrange(desc(title)) |>
+  ungroup()|>
+  slice(1)
+
+## Question 5 Compute the minimum, maximum, mean and median bpm as well 
+## as the number of songs for each musical genre. Make sure that each song 
+## is used only once in the analysis.
+
+music |>
+  distinct(title, .keep_all = TRUE) |>
+  summarise(min(bpm), max(bpm), mean(bpm),)
+music|>
+  distinct(title, .keep_all = TRUE) |>
+  group_by(`top genre`) |>
+  summarise(title=n()) |>
+  ungroup()
