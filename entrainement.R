@@ -158,11 +158,110 @@ music|>
 ## as the number of songs for each musical genre. Make sure that each song 
 ## is used only once in the analysis.
 
-music |>
-  distinct(title, .keep_all = TRUE) |>
-  summarise(min(bpm), max(bpm), mean(bpm),)
 music|>
   distinct(title, .keep_all = TRUE) |>
   group_by(`top genre`) |>
-  summarise(title=n()) |>
+  summarise(title=n(),
+            min(bpm), 
+            max(bpm), 
+            mean(bpm)) |>
   ungroup()
+
+## Exercice 2: 
+##Question 1 Load the data set using a local file name (preferably using here)
+grades <- read.csv(here("C:/Users/marin/Documents/DATA MANAGEMENT M1/Exo-entrainement/Data/grades.csv"))
+
+##Question 2 Compute the minimum, maximum, median and mean grade at the Exam.
+grades |>
+  summarise(Min=min(Exam,na.rm=TRUE ),
+            Max=max(Exam, na.rm=TRUE),
+            Mean= mean(Exam, na.rm=TRUE),
+            Median=median(Exam, na.rm=TRUE))|>
+  knitr:: kable()
+
+##Question 3 Extract the students who missed the Exam.
+grades|>
+  filter(is.na(Exam))
+
+##Question 4 Compute the number of students in each Group
+grades |>
+  group_by(Group)|>
+  summarise(n())
+
+##Question 5 Compute the number of students who missed the Exam in 
+##each Group. Beware that this number can be zero in some groups and 
+##this can induce difficulties with group_by. A way to circumvent this 
+##problem is to note that the sum of a vector of TRUE/FALSE values is 
+##exactly the number of times TRUE values that appear in the vector. 
+##For instance
+
+grades|>
+  filter(is.na(Exam))|> 
+  group_by(Group)|>
+  summarise(n())
+
+##Question 6 Create a new data frame built from the grades data set reshapped to a 
+##long format. The new data frame should keep the Id and the Group as the orignal 
+##variables. The first lines of the data frame should have the following form (the 
+## actual values may be different)
+
+grades_2 <-
+  grades |>
+  pivot_longer(cols = -c(Id, Group)) ##pivot longer tout le tableau sauf les colonnes ID et group.
+
+##Question 7 Using the long format, compute the number of missing grades in total 
+##for each student.
+grades_2 |>
+  filter(is.na(value)) |>
+  group_by(Id) |>
+  summarise(n())
+
+##Question 8 Using the long format, compute the same information as in question 5.
+
+grades_2|>
+  filter(name== "Exam")|>
+  summarise(sum(is.na(value)), .by= Group)
+
+##Question 9 Using the long format, compute the number of missing grades for the 
+##online tests for each student.
+library(stringr)
+grades_2|>
+  filter(str_detect(name, "Online"))|>
+  summarise(Number_of_missing_grades= sum(is.na(value)), .by= Id)|>
+  knitr:: kable()
+
+##Question 10 Create a table with two columns: Id to identify students and Missed 
+##with value TRUE when the student miss at least one MCQ_xx grade and FALSE when they 
+##miss no grade.
+grades <- read.csv(here("C:/Users/marin/Documents/DATA MANAGEMENT M1/Exo-entrainement/Data/grades.csv"))
+grades <-
+  grades |>
+  mutate(Missing_grades=
+           is.na(MCQ_1)|
+           is.na(MCQ_2)|
+           is.na(MCQ_3)| 
+         is.na(MCQ_4)|
+         is.na(MCQ_5)|
+         is.na(MCQ_6)|
+         is.na(MCQ_7)|
+         is.na(MCQ_8)|
+         is.na(MCQ_9)|
+         is.na(MCQ_10))
+
+grades_3 <-
+  grades |>
+  select(Id, Missing_grades)
+print(grades_3)
+
+##Question 11 Create a table with two columns: Group to identify groups and P_missed 
+##with the percentage of students in each group who missed at least one MCQ_xx grade.
+
+
+grades <-
+  grades|>
+  mutate(P_= (sum(Missing_grades==TRUE)/n())*100, .by=Group)
+
+grades_4 <-
+  grades |>
+  select(Group, P_)
+print(grades_4)
