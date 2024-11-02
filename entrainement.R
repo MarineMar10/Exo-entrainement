@@ -119,8 +119,8 @@ ggplot(wines, aes(x=`citric acid`, y=`residual sugar`, color=color))+
 ##scatter plots of the volatile acidity as a function of the fixed acidity 
 ##for red wines and white wines (one scatter plot per wine “color”).
 
-ggplot(wines, aes(y=`volatile acidity`, x=`fixed acidity`))+
-  geom_point(alpha=0.1)+
+ggplot(wines, aes(y = `volatile acidity`, x = `fixed acidity`)) +
+  geom_point(alpha = 0.1) +
   facet_wrap(vars(color))
 
 ## Ancien graded lab
@@ -233,6 +233,8 @@ grades_2|>
 ##Question 10 Create a table with two columns: Id to identify students and Missed 
 ##with value TRUE when the student miss at least one MCQ_xx grade and FALSE when they 
 ##miss no grade.
+
+## Il fallait utiliser grades 2. 
 grades <- read.csv(here("C:/Users/marin/Documents/DATA MANAGEMENT M1/Exo-entrainement/Data/grades.csv"))
 grades <-
   grades |>
@@ -250,7 +252,8 @@ grades <-
 
 grades_3 <-
   grades |>
-  select(Id, Missing_grades)
+  select(Id, Missing_grades)|>
+  arrange()
 print(grades_3)
 
 ##Question 11 Create a table with two columns: Group to identify groups and P_missed 
@@ -260,8 +263,84 @@ print(grades_3)
 grades <-
   grades|>
   mutate(P_= (sum(Missing_grades==TRUE)/n())*100, .by=Group)
-
 grades_4 <-
   grades |>
   select(Group, P_)
 print(grades_4)
+
+##Entrainement tidyr: 
+
+transactions <- data.frame( customer_id = c(1, 1, 2, 2, 3, 3), product = c("A", "B", "A", "C", "B", "C"), amount = c(100, 150, 200, 250, 300, 350) )
+
+##calculer le total amount dépensé par chaque client (customer_id).
+transactions |> 
+  group_by(customer_id)|>
+  summarise(sum(amount))
+
+##transformer le tableau en format large avec une colonne pour chaque produit.
+
+transactions |>
+  pivot_wider(names_from = product,
+              values_from = amount)
+
+data <- data.frame( year = rep(2019:2021, each = 6), city = rep(c("Paris", "Lyon", "Marseille"), times = 6), product = rep(c("A", "B"), each = 3, times = 3), sales = sample(100:1000, 18, replace = TRUE) )
+
+##calculer les ventes moyennes par city et year.
+data |>
+  group_by(city,year)|>
+  summarise(mean(sales))
+
+##Transforme les données  pour voir les ventes moyennes de chaque produit par 
+##année et par ville ne garder que les années et les ventes moyennes.
+  
+data |>
+  group_by(city,year)|>
+  mutate(mean_sales=mean(sales))|>
+  ungroup()|>
+  select(mean_sales,year)|>
+  knitr::kable()
+
+set.seed(123)  # Pour reproductibilité
+n <- 300  # Nombre de répondants
+survey_data <- data.frame(
+  respondent_id = rep(1:n, each = 3),  # Identifiant du répondant (1 à 300)
+  age = sample(18:60, n, replace = TRUE),  # Âge entre 18 et 60 ans
+  gender = sample(c("M", "F"), n, replace = TRUE),  # Sexe M/F
+  year = rep(c(2019, 2020, 2021), times = n),  # Années de l'enquête
+  q_satisfaction = sample(1:5, n * 3, replace = TRUE),  # Score de satisfaction 1 à 5
+  q_frequency = sample(1:5, n * 3, replace = TRUE),  # Fréquence d'utilisation 1 à 5
+  q_recommendation = sample(1:5, n * 3, replace = TRUE)  # Probabilité de recommander 1 à 5
+)
+head(survey_data)
+
+##ne garder que les colonnes respondent_id, year, gender, et 
+##les scores (q_satisfaction, q_frequency, q_recommendation).
+survey_data <-
+  survey_data|>
+  select(-(age))
+
+##Convertissez le tableau en format long  de manière à obtenir une colonne 
+##question (contenant le nom de chaque question) et une colonne score (valeur associée). 
+##Le tableau final doit être organisé pour faciliter une analyse par question, année, 
+##et genre.
+
+survey_data2 <-
+  survey_data|>
+  pivot_longer(cols = c(q_satisfaction, q_frequency, q_recommendation),
+               names_to = "Questions")
+
+##calculer la moyenne des scores par question, année, et genre. Cela permettra 
+##d’observer les tendances de chaque question en fonction des années et du genre.
+
+survey_data2|>
+  group_by(Questions, gender, year)|>
+  summarise(mean(value))
+
+##Transformez ensuite le tableau en format large de façon à avoir chaque question 
+##(par exemple, q_satisfaction, q_frequency, q_recommendation) en colonne, pour 
+##chaque année et chaque genre.
+
+survey_data3 <-
+  survey_data2|>
+  pivot_wider(names_from = Questions)
+
