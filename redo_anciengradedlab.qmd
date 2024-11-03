@@ -1,0 +1,61 @@
+---
+title: "Ancien graded lab redo"
+format: html
+---
+
+```{r}
+library(vroom)
+library(here)
+library(dplyr)
+library(tidyr)
+here::i_am("Exo-entrainement.Rproj")
+```
+
+## Exercise 1: 
+### Question 1: Load the data set using a local file name (preferably using here)
+```{r}
+spotify <- read.csv(here("C:/Users/marin/Documents/DATA MANAGEMENT M1/Exo-entrainement/Data/top-spotify-songs-from-20102019-by-year.csv"))
+```
+
+### Question 2: Using distinct (among other functions) compute the number of different songs, artists and musical genre that have been included in the data set.
+```{r}
+spotify |>
+  distinct(title)|>
+  summarise(n=n())
+spotify |>
+  distinct(artist)|>
+  summarise(n=n())
+spotify |>
+  distinct(top.genre)|>
+  summarise(n=n())
+```
+### Question 3: Compute the number of songs per year
+```{r}
+spotify|>
+  summarise(n=n(), .by = year)
+```
+### Question 4:  Find the most popular artist in the data set, i.e. the artist with the largest number of songs in the data set. Make sure to count each song only once.
+```{r}
+spotify|>
+  distinct(title, .keep_all = TRUE)|>
+  group_by(artist)|>
+  summarise(nb_songs= n())|>
+  arrange(desc(nb_songs))|>
+  slice(1)
+```
+### Question 5:  Compute the minimum, maximum, mean and median bpm as well as the number of songs for each musical genre. Make sure that each song is used only once in the analysis.
+```{r}
+spotify |>
+  distinct(title, .keep_all = TRUE)|>
+  group_by(top.genre)|>
+  summarise(min_bpm=min(bpm),
+            max_bpm= max(bpm),
+            median_bpm=median(bpm),
+            number_songs= n())
+```
+## Exercise 2: 
+### Question 1: Load the data set using a local file name (preferably using here).
+```{r}
+grades <- vroom(here("Data", "grades.csv"))
+```
+
