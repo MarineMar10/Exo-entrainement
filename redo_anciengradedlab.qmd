@@ -84,4 +84,34 @@ grades |>
   group_by(Group)|>
   summarise(missed= sum(is.na(Exam)))
 ```
+### QUestion 6: Create a new data frame built from the grades data set reshapped to a long format. The new data frame should keep the Id and the Group as the orignal variables. The first lines of the data frame should have the following form (the actual values may be different)
+```{r}
+grades2 <-
+  grades |>
+  pivot_longer(cols = -c(Id, Group),
+               names_to = "Exam Name",
+               values_to = "Grade")
+```
+
+### Question 7: Using the long format, compute the number of missing grades in total for each student.
+```{r}
+grades2|>
+  group_by(Id)|>
+  summarise(missed= sum(is.na(Grade)))
+```
+### Question 8: Using the long format, compute the same information as in question 5
+```{r}
+grades2|>
+  filter(`Exam Name`=="Exam")|>
+  group_by(Group)|>
+  summarise(missed= sum(is.na(Grade)))
+```
+### Question 9: Using the long format, compute the number of missing grades for the online tests for each student.
+```{r}
+library(stringr)
+grades2|>
+  filter(str_starts(`Exam Name`, "Online"))|>
+  group_by(Id)|>
+  summarise(missed= sum(is.na(Grade)))
+```
 
