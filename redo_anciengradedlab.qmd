@@ -58,4 +58,30 @@ spotify |>
 ```{r}
 grades <- vroom(here("Data", "grades.csv"))
 ```
+### Question 2: Compute the minimum, maximum, median and mean grade at the Exam.
+```{r}
+grades|>
+  summarise(min_grade = min(Exam,na.rm=TRUE),
+            max_grade= max(Exam, na.rm=TRUE),
+            median_grade = median(Exam, na.rm=TRUE),
+            mean_grade= mean(Exam, na.rm=TRUE))
+```
+
+### Question 3: Extract the students who missed the Exam.
+```{r}
+grades |>
+  filter(is.na(Exam))
+```
+### Question 4: Compute the number of students in each Group
+```{r}
+grades |>
+  group_by(Group)|>
+  summarise(nb_students=n())
+```
+### Question 5: Compute the number of students who missed the Exam in each Group. Beware that this number can be zero in some groups and this can induce difficulties with group_by
+```{r}
+grades |>
+  group_by(Group)|>
+  summarise(missed= sum(is.na(Exam)))
+```
 
